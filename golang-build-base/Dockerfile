@@ -1,0 +1,3 @@
+FROM golang:1.12.7
+
+ENV GO111MODULE on

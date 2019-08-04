@@ -1,0 +1,34 @@
+trigger:
+  branches:
+    include:
+      - master
+      - feature/*
+      - bug/*
+  paths:
+    include:
+      - '/golang-build-base'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: Docker@2
+  displayName: Docker Login
+  inputs:
+    containerRegistry: 'Decentralized Cloud Docker Hub'
+    command: 'login'
+
+- task: Docker@2
+  displayName: Building Golang Build Base Docker Image
+  inputs:
+    containerRegistry: 'Decentralized Cloud Docker Hub'
+    repository: 'decentralizedcloud/golang-build-base'
+    command: 'buildAndPush'
+    Dockerfile: '$(system.defaultWorkingDirectory)/golang-build-base/Dockerfile'
+
+- task: Docker@2
+  displayName: Docker Logout
+  inputs:
+    containerRegistry: 'Decentralized Cloud Docker Hub'
+    command: 'logout'
+
