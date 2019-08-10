@@ -1,9 +1,7 @@
 trigger:
   branches:
     include:
-      - master
-      - feature/*
-      - bug/*
+      - "*"
   paths:
     include:
       - '/golang-build-base'
@@ -12,6 +10,12 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+- task: Bash@3
+  inputs:
+    filePath: '$(system.defaultWorkingDirectory)/scripts/generate-docker-tag.sh'
+    arguments: $(Build.SourceBranch) $(Build.BuildId)
+  displayName: "Generating docker tags"
+
 - task: Docker@2
   displayName: Docker Login
   inputs:
@@ -25,10 +29,12 @@ steps:
     repository: 'decentralizedcloud/golang-build-base'
     command: 'buildAndPush'
     Dockerfile: '$(system.defaultWorkingDirectory)/golang-build-base/Dockerfile'
+    tags: |
+      $(GENERATED_DOCKER_TAG_ID)
+      $(GENERATED_DOCKER_TAG)
 
 - task: Docker@2
   displayName: Docker Logout
   inputs:
     containerRegistry: 'Decentralized Cloud Docker Hub'
     command: 'logout'
-
