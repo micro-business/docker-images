@@ -9,26 +9,32 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+variables:
+  DOCKER_TAG_GENERATORT_SCRIPT: '$(system.defaultWorkingDirectory)/scripts/generate-docker-tag.sh'
+  DOCKER_CONTAINER_REGISTRY: 'Decentralized Cloud Docker Hub'
+  DOCKER_REPOSITORY_NAME: 'decentralizedcloud/golang-build-base'
+  DOCKER_FILE_PATH: '$(system.defaultWorkingDirectory)/golang-build-base/Dockerfile'
+
 steps:
 - task: Bash@3
   inputs:
-    filePath: '$(system.defaultWorkingDirectory)/scripts/generate-docker-tag.sh'
+    filePath: $(DOCKER_TAG_GENERATORT_SCRIPT)
     arguments: $(Build.SourceBranch) $(Build.BuildId)
   displayName: "Generating docker tags"
 
 - task: Docker@2
   displayName: Docker Login
   inputs:
-    containerRegistry: 'Decentralized Cloud Docker Hub'
+    containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
     command: 'login'
 
 - task: Docker@2
   displayName: Building Golang Build Base Docker Image
   inputs:
-    containerRegistry: 'Decentralized Cloud Docker Hub'
-    repository: 'decentralizedcloud/golang-build-base'
+    containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
+    repository: $(DOCKER_REPOSITORY_NAME)
     command: 'buildAndPush'
-    Dockerfile: '$(system.defaultWorkingDirectory)/golang-build-base/Dockerfile'
+    Dockerfile: $(DOCKER_FILE_PATH)
     tags: |
       $(GENERATED_DOCKER_TAG_ID)
       $(GENERATED_DOCKER_TAG)
@@ -36,5 +42,5 @@ steps:
 - task: Docker@2
   displayName: Docker Logout
   inputs:
-    containerRegistry: 'Decentralized Cloud Docker Hub'
+    containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
     command: 'logout'
