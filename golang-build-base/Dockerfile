@@ -1,4 +1,2 @@
-FROM golang:1.12.7
+FROM golang:1.13
 LABEL maintainer="morteza.alizadeh@gmail.com"
-
-ENV GO111MODULE on
