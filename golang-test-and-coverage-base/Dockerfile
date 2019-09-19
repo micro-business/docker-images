@@ -1,4 +1,4 @@
-FROM decentralizedcloud/golang-build-base:latest
+FROM decentralizedcloud/golang-build-base:232
 LABEL maintainer="morteza.alizadeh@gmail.com"
 
 RUN mkdir -p $GOPATH/src/temporary
