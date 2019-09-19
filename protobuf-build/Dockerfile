@@ -1,4 +1,4 @@
-FROM golang:1.13
+FROM decentralizedcloud/golang-build-base:232
 LABEL maintainer="morteza.alizadeh@gmail.com"
 
 RUN apt-get update -y

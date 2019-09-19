@@ -29,7 +29,7 @@ steps:
     command: 'login'
 
 - task: Docker@2
-  displayName: Building Golang Build Base Docker Image
+  displayName: Building Protobuf Build Base Docker Image
   inputs:
     containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
     repository: $(DOCKER_REPOSITORY_NAME)
