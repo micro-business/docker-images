@@ -29,7 +29,7 @@ steps:
 - task: Docker@2
   displayName: Build Protobuf builder image
   inputs:
-    repository: $(PROTOBUF_BUILDERDOCKER_REPOSITORY_NAME)
+    repository: $(PROTOBUF_BUILDER_DOCKER_REPOSITORY_NAME)
     command: 'build'
     Dockerfile: '$(system.defaultWorkingDirectory)/protobuf-builder/Dockerfile'
     buildContext: '$(system.defaultWorkingDirectory)'
@@ -46,7 +46,7 @@ steps:
   displayName: Push Protobuf builder image
   inputs:
     containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
-    repository: $(PROTOBUF_BUILDERDOCKER_REPOSITORY_NAME)
+    repository: $(PROTOBUF_BUILDER_DOCKER_REPOSITORY_NAME)
     command: 'push'
     Dockerfile: $(BUILD_DOCKER_FILE_PATH)
     buildContext: '$(system.defaultWorkingDirectory)'
