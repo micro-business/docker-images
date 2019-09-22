@@ -1,0 +1,60 @@
+trigger:
+  tags:
+    include:
+      - v*
+  branches:
+    include:
+      - master
+      - release/*
+      - feature/*
+      - bug/*
+  paths:
+    exclude:
+      - README.md
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  DOCKER_CONTAINER_REGISTRY: 'Decentralized Cloud Docker Hub'
+  PROTOBUF_BUILDER_DOCKER_REPOSITORY_NAME: 'decentralizedcloud/protobuf-builder'
+
+steps:
+- task: Bash@3
+  displayName: "Generating docker tags"
+  inputs:
+    filePath:  '$(system.defaultWorkingDirectory)/script/generate-version.sh'
+    arguments: $(Build.SourceBranch)
+
+- task: Docker@2
+  displayName: Build Protobuf builder image
+  inputs:
+    repository: $(PROTOBUF_BUILDERDOCKER_REPOSITORY_NAME)
+    command: 'build'
+    Dockerfile: '$(system.defaultWorkingDirectory)/protobuf-builder/Dockerfile'
+    buildContext: '$(system.defaultWorkingDirectory)'
+    arguments: '--build-arg VERSION=$(VERSION)'
+    tags: $(VERSION)
+
+- task: Docker@2
+  displayName: Docker Login
+  inputs:
+    containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
+    command: 'login'
+
+- task: Docker@2
+  displayName: Push Protobuf builder image
+  inputs:
+    containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
+    repository: $(PROTOBUF_BUILDERDOCKER_REPOSITORY_NAME)
+    command: 'push'
+    Dockerfile: $(BUILD_DOCKER_FILE_PATH)
+    buildContext: '$(system.defaultWorkingDirectory)'
+    tags: $(VERSION)
+
+- task: Docker@2
+  displayName: Docker Logout
+  inputs:
+    containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
+    command: 'logout'
+
