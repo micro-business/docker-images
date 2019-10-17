@@ -18,6 +18,7 @@ pool:
 variables:
   DOCKER_CONTAINER_REGISTRY: 'Decentralized Cloud Docker Hub'
   PROTOBUF_BUILDER_DOCKER_REPOSITORY_NAME: 'decentralizedcloud/protobuf-builder'
+  K8S_TOOLSET_DOCKER_REPOSITORY_NAME: 'decentralizedcloud/k8s-toolset'
 
 steps:
 - task: Bash@3
@@ -37,6 +38,16 @@ steps:
     tags: $(VERSION)
 
 - task: Docker@2
+  displayName: Build K8S toolset image
+  inputs:
+    repository: $(K8S_TOOLSET_DOCKER_REPOSITORY_NAME)
+    command: 'build'
+    Dockerfile: '$(system.defaultWorkingDirectory)/k8s-toolset/Dockerfile'
+    buildContext: '$(system.defaultWorkingDirectory)'
+    arguments: '--build-arg VERSION=$(VERSION)'
+    tags: $(VERSION)
+
+- task: Docker@2
   displayName: Docker Login
   inputs:
     containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
@@ -48,7 +59,15 @@ steps:
     containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
     repository: $(PROTOBUF_BUILDER_DOCKER_REPOSITORY_NAME)
     command: 'push'
-    Dockerfile: $(BUILD_DOCKER_FILE_PATH)
+    buildContext: '$(system.defaultWorkingDirectory)'
+    tags: $(VERSION)
+
+- task: Docker@2
+  displayName: Push K8S toolset image
+  inputs:
+    containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
+    repository: $(K8S_TOOLSET_DOCKER_REPOSITORY_NAME)
+    command: 'push'
     buildContext: '$(system.defaultWorkingDirectory)'
     tags: $(VERSION)
 
