@@ -15,3 +15,5 @@ RUN go get -d -u github.com/golang/protobuf/protoc-gen-go
 RUN git -C "$(go env GOPATH)"/src/github.com/golang/protobuf checkout $GIT_TAG
 RUN go install github.com/golang/protobuf/protoc-gen-go
 
+RUN apt-get clean
+
