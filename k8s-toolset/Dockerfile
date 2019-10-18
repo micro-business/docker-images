@@ -2,7 +2,7 @@ FROM ubuntu:18.04
 LABEL maintainer="morteza.alizadeh@gmail.com"
 
 RUN apt-get update -y
-RUN apt-get install -y --no-install-recommends curl
+RUN apt-get install -y --no-install-recommends curl git
 
 RUN curl --insecure -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
 RUN chmod +x ./kubectl
