@@ -19,6 +19,7 @@ variables:
   DOCKER_CONTAINER_REGISTRY: 'Decentralized Cloud Docker Hub'
   PROTOBUF_BUILDER_DOCKER_REPOSITORY_NAME: 'decentralizedcloud/protobuf-builder'
   K8S_TOOLSET_DOCKER_REPOSITORY_NAME: 'decentralizedcloud/k8s-toolset'
+  FIREBASE_TOOLSET_DOCKER_REPOSITORY_NAME: 'decentralizedcloud/firebase-toolset'
 
 steps:
 - task: GitVersion@5
@@ -47,6 +48,16 @@ steps:
     tags: $(GitVersion.SemVer)
 
 - task: Docker@2
+  displayName: Build Firebase toolset image
+  inputs:
+    repository: $(FIREBASE_TOOLSET_DOCKER_REPOSITORY_NAME)
+    command: 'build'
+    Dockerfile: '$(system.defaultWorkingDirectory)/firebase-toolset/Dockerfile'
+    buildContext: '$(system.defaultWorkingDirectory)'
+    arguments: '--build-arg VERSION=$(GitVersion.SemVer)'
+    tags: $(GitVersion.SemVer)
+
+- task: Docker@2
   displayName: Docker Login
   inputs:
     containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
@@ -66,6 +77,15 @@ steps:
   inputs:
     containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
     repository: $(K8S_TOOLSET_DOCKER_REPOSITORY_NAME)
+    command: 'push'
+    buildContext: '$(system.defaultWorkingDirectory)'
+    tags: $(GitVersion.SemVer)
+
+- task: Docker@2
+  displayName: Push Firebase toolset image
+  inputs:
+    containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
+    repository: $(FIREBASE_TOOLSET_DOCKER_REPOSITORY_NAME)
     command: 'push'
     buildContext: '$(system.defaultWorkingDirectory)'
     tags: $(GitVersion.SemVer)

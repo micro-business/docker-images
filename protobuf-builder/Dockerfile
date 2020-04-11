@@ -1,4 +1,4 @@
-FROM golang:1.14.1
+FROM golang:1.14.2
 LABEL maintainer="morteza.alizadeh@gmail.com"
 
 RUN apt-get update -y
