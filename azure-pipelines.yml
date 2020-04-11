@@ -16,10 +16,10 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  DOCKER_CONTAINER_REGISTRY: 'Decentralized Cloud Docker Hub'
-  PROTOBUF_BUILDER_DOCKER_REPOSITORY_NAME: 'decentralizedcloud/protobuf-builder'
-  K8S_TOOLSET_DOCKER_REPOSITORY_NAME: 'decentralizedcloud/k8s-toolset'
-  FIREBASE_TOOLSET_DOCKER_REPOSITORY_NAME: 'decentralizedcloud/firebase-toolset'
+  DOCKER_CONTAINER_REGISTRY: 'Micro Business Docker Hub'
+  PROTOBUF_BUILDER_DOCKER_REPOSITORY_NAME: 'microbusiness/protobuf-builder'
+  K8S_TOOLSET_DOCKER_REPOSITORY_NAME: 'microbusiness/k8s-toolset'
+  FIREBASE_TOOLSET_DOCKER_REPOSITORY_NAME: 'microbusiness/firebase-toolset'
 
 steps:
 - task: GitVersion@5
