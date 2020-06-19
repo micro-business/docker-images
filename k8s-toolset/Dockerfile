@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 LABEL maintainer="morteza.alizadeh@gmail.com"
 
 RUN apt-get update -y
@@ -8,7 +8,7 @@ RUN curl --insecure -LO https://storage.googleapis.com/kubernetes-release/releas
 RUN chmod +x ./kubectl
 RUN mv ./kubectl /usr/local/bin/
 
-RUN curl --insecure -Lo ./helm.tar.gz https://get.helm.sh/helm-v3.1.0-linux-amd64.tar.gz
+RUN curl --insecure -Lo ./helm.tar.gz https://get.helm.sh/helm-v3.2.4-linux-amd64.tar.gz
 RUN mkdir ./helm
 RUN tar -C ./helm -xzf helm.tar.gz
 RUN mv ./helm/linux-amd64/helm /usr/local/bin/
