@@ -1,19 +1,16 @@
 FROM ubuntu:20.04
 LABEL maintainer="morteza.alizadeh@gmail.com"
 
-RUN apt-get update -y
-RUN apt-get install -y --no-install-recommends curl git
+RUN apt-get update -y && apt-get install -y --no-install-recommends ca-certificates apt-transport-https gnupg2 curl
+RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+RUN echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends kubectl
 
-RUN curl --insecure -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
-RUN chmod +x ./kubectl
-RUN mv ./kubectl /usr/local/bin/
-
-RUN curl --insecure -Lo ./helm.tar.gz https://get.helm.sh/helm-v3.2.4-linux-amd64.tar.gz
-RUN mkdir ./helm
-RUN tar -C ./helm -xzf helm.tar.gz
-RUN mv ./helm/linux-amd64/helm /usr/local/bin/
-RUN rm -rf ./helm
-RUN rm -rf helm.tar.gz
+RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+RUN chmod 700 get_helm.sh
+RUN ./get_helm.sh
+RUN rm -f ./get_helm.sh
 
 RUN apt-get clean
 
