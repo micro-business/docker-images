@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 LABEL maintainer="morteza.alizadeh@gmail.com"
 
-RUN apt-get update -y && apt-get install -y --no-install-recommends ca-certificates apt-transport-https gnupg2 curl
+RUN apt-get update -y && apt-get install -y --no-install-recommends ca-certificates apt-transport-https gnupg2 curl git
 RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 RUN echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list
 RUN apt-get update
