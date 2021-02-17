@@ -1,4 +1,4 @@
-FROM golang:1.15
+FROM golang:1.16
 LABEL maintainer="morteza.alizadeh@gmail.com"
 
 RUN apt-get update -y
@@ -12,9 +12,8 @@ RUN unzip -o $PROTOC_ZIP -d /usr/local include/*
 RUN rm -f $PROTOC_ZIP
 
 ENV GIT_TAG="v1.4.3"
-RUN go get -d -u github.com/golang/protobuf/protoc-gen-go
-RUN git -C "$(go env GOPATH)"/src/github.com/golang/protobuf checkout $GIT_TAG
-RUN go install github.com/golang/protobuf/protoc-gen-go
+RUN go get -d -u github.com/golang/protobuf/protoc-gen-go@$GIT_TAG
+RUN go install github.com/golang/protobuf/protoc-gen-go@$GIT_TAG
 
 RUN apt-get clean
 
