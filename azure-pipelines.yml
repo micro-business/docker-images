@@ -4,7 +4,7 @@ trigger:
       - v*
   branches:
     include:
-      - master
+      - main
       - release/*
       - feature/*
       - hotfix/*
@@ -20,10 +20,14 @@ variables:
   PROTOBUF_BUILDER_DOCKER_REPOSITORY_NAME: 'microbusiness/protobuf-builder'
   K8S_TOOLSET_DOCKER_REPOSITORY_NAME: 'microbusiness/k8s-toolset'
   FIREBASE_TOOLSET_DOCKER_REPOSITORY_NAME: 'microbusiness/firebase-toolset'
+  ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+    version: latest
+  ${{ if not(eq(variables['Build.SourceBranch'], 'refs/heads/main')) }}:
+    version: $(GitVersion.SemVer)
 
 steps:
 - task: GitVersion@5
-  displayName: "Extracting versioning details"
+  displayName: "Figure out GitVersion"
   inputs:
     runtime: 'core'
     configFilePath: './GitVersion.yml'
@@ -35,8 +39,8 @@ steps:
     command: 'build'
     Dockerfile: '$(system.defaultWorkingDirectory)/protobuf-builder/Dockerfile'
     buildContext: '$(system.defaultWorkingDirectory)'
-    arguments: '--build-arg VERSION=$(GitVersion.SemVer)'
-    tags: $(GitVersion.SemVer)
+    arguments: '--build-arg VERSION=${{variables.version}}'
+    tags: ${{variables.version}}
 
 - task: Docker@2
   displayName: Build K8S toolset image
@@ -45,8 +49,8 @@ steps:
     command: 'build'
     Dockerfile: '$(system.defaultWorkingDirectory)/k8s-toolset/Dockerfile'
     buildContext: '$(system.defaultWorkingDirectory)'
-    arguments: '--build-arg VERSION=$(GitVersion.SemVer)'
-    tags: $(GitVersion.SemVer)
+    arguments: '--build-arg VERSION=${{variables.version}}'
+    tags: ${{variables.version}}
 
 - task: Docker@2
   displayName: Build Firebase toolset image
@@ -55,8 +59,8 @@ steps:
     command: 'build'
     Dockerfile: '$(system.defaultWorkingDirectory)/firebase-toolset/Dockerfile'
     buildContext: '$(system.defaultWorkingDirectory)'
-    arguments: '--build-arg VERSION=$(GitVersion.SemVer)'
-    tags: $(GitVersion.SemVer)
+    arguments: '--build-arg VERSION=${{variables.version}}'
+    tags: ${{variables.version}}
 
 - task: Docker@2
   displayName: Docker Login
@@ -71,7 +75,7 @@ steps:
     repository: $(PROTOBUF_BUILDER_DOCKER_REPOSITORY_NAME)
     command: 'push'
     buildContext: '$(system.defaultWorkingDirectory)'
-    tags: $(GitVersion.SemVer)
+    tags: ${{variables.version}}
 
 - task: Docker@2
   displayName: Push K8S toolset image
@@ -80,7 +84,7 @@ steps:
     repository: $(K8S_TOOLSET_DOCKER_REPOSITORY_NAME)
     command: 'push'
     buildContext: '$(system.defaultWorkingDirectory)'
-    tags: $(GitVersion.SemVer)
+    tags: ${{variables.version}}
 
 - task: Docker@2
   displayName: Push Firebase toolset image
@@ -89,7 +93,7 @@ steps:
     repository: $(FIREBASE_TOOLSET_DOCKER_REPOSITORY_NAME)
     command: 'push'
     buildContext: '$(system.defaultWorkingDirectory)'
-    tags: $(GitVersion.SemVer)
+    tags: ${{variables.version}}
 
 - task: Docker@2
   displayName: Docker Logout
