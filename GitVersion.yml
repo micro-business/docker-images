@@ -1,7 +1,6 @@
 mode: ContinuousDeployment
 branches:
-  master:
-    regex: (^master$|^origin\/master$|^main$|^origin\/main$)
+  master: {}
   release: {}
   feature: {}
   hotfix: {}

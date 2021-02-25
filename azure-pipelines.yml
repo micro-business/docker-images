@@ -13,91 +13,94 @@ trigger:
       - README.md
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: "ubuntu-latest"
 
 variables:
-  DOCKER_CONTAINER_REGISTRY: 'Micro Business Docker Hub'
-  PROTOBUF_BUILDER_DOCKER_REPOSITORY_NAME: 'microbusiness/protobuf-builder'
-  K8S_TOOLSET_DOCKER_REPOSITORY_NAME: 'microbusiness/k8s-toolset'
-  FIREBASE_TOOLSET_DOCKER_REPOSITORY_NAME: 'microbusiness/firebase-toolset'
+  DOCKER_CONTAINER_REGISTRY: "Micro Business Docker Hub"
+  PROTOBUF_BUILDER_DOCKER_REPOSITORY_NAME: "microbusiness/protobuf-builder"
+  K8S_TOOLSET_DOCKER_REPOSITORY_NAME: "microbusiness/k8s-toolset"
+  FIREBASE_TOOLSET_DOCKER_REPOSITORY_NAME: "microbusiness/firebase-toolset"
   ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
-    version: latest
+    artifact_version: latest
   ${{ if not(eq(variables['Build.SourceBranch'], 'refs/heads/main')) }}:
-    version: $(GitVersion.SemVer)
+    artifact_version: $(GitVersion.SemVer)
 
 steps:
-- task: GitVersion@5
-  displayName: "Figure out GitVersion"
-  inputs:
-    runtime: 'core'
-    configFilePath: './GitVersion.yml'
+  - task: gitversion/setup@0
+    displayName: "Setting up GitVersion"
+    inputs:
+      versionSpec: "5.x"
 
-- task: Docker@2
-  displayName: Build Protobuf builder image
-  inputs:
-    repository: $(PROTOBUF_BUILDER_DOCKER_REPOSITORY_NAME)
-    command: 'build'
-    Dockerfile: '$(system.defaultWorkingDirectory)/protobuf-builder/Dockerfile'
-    buildContext: '$(system.defaultWorkingDirectory)'
-    arguments: '--build-arg VERSION=${{variables.version}}'
-    tags: ${{variables.version}}
+  - task: gitversion/execute@0
+    displayName: "Figure out GitVersion"
+    inputs:
+      configFilePath: "./GitVersion.yml"
 
-- task: Docker@2
-  displayName: Build K8S toolset image
-  inputs:
-    repository: $(K8S_TOOLSET_DOCKER_REPOSITORY_NAME)
-    command: 'build'
-    Dockerfile: '$(system.defaultWorkingDirectory)/k8s-toolset/Dockerfile'
-    buildContext: '$(system.defaultWorkingDirectory)'
-    arguments: '--build-arg VERSION=${{variables.version}}'
-    tags: ${{variables.version}}
+  - task: Docker@2
+    displayName: Build Protobuf builder image
+    inputs:
+      repository: $(PROTOBUF_BUILDER_DOCKER_REPOSITORY_NAME)
+      command: "build"
+      Dockerfile: "$(system.defaultWorkingDirectory)/protobuf-builder/Dockerfile"
+      buildContext: "$(system.defaultWorkingDirectory)"
+      arguments: "--build-arg VERSION=${{variables.artifact_version}}"
+      tags: ${{variables.artifact_version}}
 
-- task: Docker@2
-  displayName: Build Firebase toolset image
-  inputs:
-    repository: $(FIREBASE_TOOLSET_DOCKER_REPOSITORY_NAME)
-    command: 'build'
-    Dockerfile: '$(system.defaultWorkingDirectory)/firebase-toolset/Dockerfile'
-    buildContext: '$(system.defaultWorkingDirectory)'
-    arguments: '--build-arg VERSION=${{variables.version}}'
-    tags: ${{variables.version}}
+  - task: Docker@2
+    displayName: Build K8S toolset image
+    inputs:
+      repository: $(K8S_TOOLSET_DOCKER_REPOSITORY_NAME)
+      command: "build"
+      Dockerfile: "$(system.defaultWorkingDirectory)/k8s-toolset/Dockerfile"
+      buildContext: "$(system.defaultWorkingDirectory)"
+      arguments: "--build-arg VERSION=${{variables.artifact_version}}"
+      tags: ${{variables.artifact_version}}
 
-- task: Docker@2
-  displayName: Docker Login
-  inputs:
-    containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
-    command: 'login'
+  - task: Docker@2
+    displayName: Build Firebase toolset image
+    inputs:
+      repository: $(FIREBASE_TOOLSET_DOCKER_REPOSITORY_NAME)
+      command: "build"
+      Dockerfile: "$(system.defaultWorkingDirectory)/firebase-toolset/Dockerfile"
+      buildContext: "$(system.defaultWorkingDirectory)"
+      arguments: "--build-arg VERSION=${{variables.artifact_version}}"
+      tags: ${{variables.artifact_version}}
 
-- task: Docker@2
-  displayName: Push Protobuf builder image
-  inputs:
-    containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
-    repository: $(PROTOBUF_BUILDER_DOCKER_REPOSITORY_NAME)
-    command: 'push'
-    buildContext: '$(system.defaultWorkingDirectory)'
-    tags: ${{variables.version}}
+  - task: Docker@2
+    displayName: Docker Login
+    inputs:
+      containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
+      command: "login"
 
-- task: Docker@2
-  displayName: Push K8S toolset image
-  inputs:
-    containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
-    repository: $(K8S_TOOLSET_DOCKER_REPOSITORY_NAME)
-    command: 'push'
-    buildContext: '$(system.defaultWorkingDirectory)'
-    tags: ${{variables.version}}
+  - task: Docker@2
+    displayName: Push Protobuf builder image
+    inputs:
+      containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
+      repository: $(PROTOBUF_BUILDER_DOCKER_REPOSITORY_NAME)
+      command: "push"
+      buildContext: "$(system.defaultWorkingDirectory)"
+      tags: ${{variables.artifact_version}}
 
-- task: Docker@2
-  displayName: Push Firebase toolset image
-  inputs:
-    containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
-    repository: $(FIREBASE_TOOLSET_DOCKER_REPOSITORY_NAME)
-    command: 'push'
-    buildContext: '$(system.defaultWorkingDirectory)'
-    tags: ${{variables.version}}
+  - task: Docker@2
+    displayName: Push K8S toolset image
+    inputs:
+      containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
+      repository: $(K8S_TOOLSET_DOCKER_REPOSITORY_NAME)
+      command: "push"
+      buildContext: "$(system.defaultWorkingDirectory)"
+      tags: ${{variables.artifact_version}}
 
-- task: Docker@2
-  displayName: Docker Logout
-  inputs:
-    containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
-    command: 'logout'
+  - task: Docker@2
+    displayName: Push Firebase toolset image
+    inputs:
+      containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
+      repository: $(FIREBASE_TOOLSET_DOCKER_REPOSITORY_NAME)
+      command: "push"
+      buildContext: "$(system.defaultWorkingDirectory)"
+      tags: ${{variables.artifact_version}}
 
+  - task: Docker@2
+    displayName: Docker Logout
+    inputs:
+      containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
+      command: "logout"
