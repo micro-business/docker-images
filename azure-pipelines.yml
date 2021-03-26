@@ -12,95 +12,53 @@ trigger:
     exclude:
       - README.md
 
-pool:
-  vmImage: "ubuntu-latest"
-
 variables:
-  DOCKER_CONTAINER_REGISTRY: "Micro Business Docker Hub"
-  PROTOBUF_BUILDER_DOCKER_REPOSITORY_NAME: "microbusiness/protobuf-builder"
-  K8S_TOOLSET_DOCKER_REPOSITORY_NAME: "microbusiness/k8s-toolset"
-  FIREBASE_TOOLSET_DOCKER_REPOSITORY_NAME: "microbusiness/firebase-toolset"
-  ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
-    artifact_version: latest
-  ${{ if not(eq(variables['Build.SourceBranch'], 'refs/heads/main')) }}:
-    artifact_version: $(GitVersion.SemVer)
+  - template: variables.yml
 
-steps:
-  - task: gitversion/setup@0
-    displayName: "Setting up GitVersion"
-    inputs:
-      versionSpec: "5.x"
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      name: micro-business/templates
+      endpoint: micro-business
 
-  - task: gitversion/execute@0
-    displayName: "Figure out GitVersion"
-    inputs:
-      configFilePath: "./GitVersion.yml"
+name: $(GitVersion.SemVer)
 
-  - task: Docker@2
-    displayName: Build Protobuf builder image
-    inputs:
-      repository: $(PROTOBUF_BUILDER_DOCKER_REPOSITORY_NAME)
-      command: "build"
-      Dockerfile: "$(system.defaultWorkingDirectory)/protobuf-builder/Dockerfile"
-      buildContext: "$(system.defaultWorkingDirectory)"
-      arguments: "--build-arg VERSION=${{variables.artifact_version}}"
-      tags: ${{variables.artifact_version}}
+stages:
+  - stage: Build
+    jobs:
+      - job: Build_Protobuf
+        pool:
+          vmImage: ${{ variables.linuxVmImage }}
+        steps:
+          - template: build/build-push-docker-image.yml@templates
+            parameters:
+              version: ${{ variables.artifactVersion }}
+              dockerContainerRegistry: ${{ variables.dockerContainerRegistry }}
+              dockerRepositoryName: ${{ variables.protobufDockerRepositoryName }}
+              dockerFilePath: ${{ variables.protobufDockerFilePath }}
+              dockerBuildContext: "$(system.defaultWorkingDirectory)"
 
-  - task: Docker@2
-    displayName: Build K8S toolset image
-    inputs:
-      repository: $(K8S_TOOLSET_DOCKER_REPOSITORY_NAME)
-      command: "build"
-      Dockerfile: "$(system.defaultWorkingDirectory)/k8s-toolset/Dockerfile"
-      buildContext: "$(system.defaultWorkingDirectory)"
-      arguments: "--build-arg VERSION=${{variables.artifact_version}}"
-      tags: ${{variables.artifact_version}}
+      - job: Build_K8S_Toolset_Image
+        pool:
+          vmImage: ${{ variables.linuxVmImage }}
+        steps:
+          - template: build/build-push-docker-image.yml@templates
+            parameters:
+              version: ${{ variables.artifactVersion }}
+              dockerContainerRegistry: ${{ variables.dockerContainerRegistry }}
+              dockerRepositoryName: ${{ variables.k8sToolsetDockerRepositoryName }}
+              dockerFilePath: ${{ variables.k8sToolsetDockerFilePath }}
+              dockerBuildContext: "$(system.defaultWorkingDirectory)"
 
-  - task: Docker@2
-    displayName: Build Firebase toolset image
-    inputs:
-      repository: $(FIREBASE_TOOLSET_DOCKER_REPOSITORY_NAME)
-      command: "build"
-      Dockerfile: "$(system.defaultWorkingDirectory)/firebase-toolset/Dockerfile"
-      buildContext: "$(system.defaultWorkingDirectory)"
-      arguments: "--build-arg VERSION=${{variables.artifact_version}}"
-      tags: ${{variables.artifact_version}}
-
-  - task: Docker@2
-    displayName: Docker Login
-    inputs:
-      containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
-      command: "login"
-
-  - task: Docker@2
-    displayName: Push Protobuf builder image
-    inputs:
-      containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
-      repository: $(PROTOBUF_BUILDER_DOCKER_REPOSITORY_NAME)
-      command: "push"
-      buildContext: "$(system.defaultWorkingDirectory)"
-      tags: ${{variables.artifact_version}}
-
-  - task: Docker@2
-    displayName: Push K8S toolset image
-    inputs:
-      containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
-      repository: $(K8S_TOOLSET_DOCKER_REPOSITORY_NAME)
-      command: "push"
-      buildContext: "$(system.defaultWorkingDirectory)"
-      tags: ${{variables.artifact_version}}
-
-  - task: Docker@2
-    displayName: Push Firebase toolset image
-    inputs:
-      containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
-      repository: $(FIREBASE_TOOLSET_DOCKER_REPOSITORY_NAME)
-      command: "push"
-      buildContext: "$(system.defaultWorkingDirectory)"
-      tags: ${{variables.artifact_version}}
-
-  - task: Docker@2
-    displayName: Docker Logout
-    inputs:
-      containerRegistry: $(DOCKER_CONTAINER_REGISTRY)
-      command: "logout"
+      - job: Build_Firebase_Toolset_Image
+        pool:
+          vmImage: ${{ variables.linuxVmImage }}
+        steps:
+          - template: build/build-push-docker-image.yml@templates
+            parameters:
+              version: ${{ variables.artifactVersion }}
+              dockerContainerRegistry: ${{ variables.dockerContainerRegistry }}
+              dockerRepositoryName: ${{ variables.firebaseToolsetDockerRepositoryName }}
+              dockerFilePath: ${{ variables.firebaseToolsetDockerFilePath }}
+              dockerBuildContext: "$(system.defaultWorkingDirectory)"

@@ -1,0 +1,30 @@
+variables:
+  - name: artifactVersion
+    ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+      value: latest
+    ${{ if not(eq(variables['Build.SourceBranch'], 'refs/heads/main')) }}:
+      value: $(GitVersion.SemVer)
+
+  - name: linuxVmImage
+    value: "ubuntu-20.04"
+
+  - name: dockerContainerRegistry
+    value: "Micro Business Docker Hub"
+
+  - name: protobufDockerRepositoryName
+    value: "microbusiness/protobuf-builder"
+
+  - name: protobufDockerFilePath
+    value: "$(system.defaultWorkingDirectory)/protobuf-builder/Dockerfile"
+
+  - name: k8sToolsetDockerRepositoryName
+    value: "microbusiness/k8s-toolset"
+
+  - name: k8sToolsetDockerFilePath
+    value: "$(system.defaultWorkingDirectory)/k8s-toolset/Dockerfile"
+
+  - name: firebaseToolsetDockerRepositoryName
+    value: "microbusiness/firebase-toolset"
+
+  - name: firebaseToolsetDockerFilePath
+    value: "$(system.defaultWorkingDirectory)/firebase-toolset/Dockerfile"
