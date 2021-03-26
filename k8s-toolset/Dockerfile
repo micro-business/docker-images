@@ -13,4 +13,3 @@ RUN ./get_helm.sh
 RUN rm -f ./get_helm.sh
 
 RUN apt-get clean
-
