@@ -62,3 +62,15 @@ stages:
               dockerRepositoryName: ${{ variables.firebaseToolsetDockerRepositoryName }}
               dockerFilePath: ${{ variables.firebaseToolsetDockerFilePath }}
               dockerBuildContext: "$(system.defaultWorkingDirectory)"
+
+      - job: Build_Go_Toolset_Image
+        pool:
+          vmImage: ${{ variables.linuxVmImage }}
+        steps:
+          - template: build/build-push-docker-image.yml@templates
+            parameters:
+              version: ${{ variables.artifactVersion }}
+              dockerContainerRegistry: ${{ variables.dockerContainerRegistry }}
+              dockerRepositoryName: ${{ variables.goToolsetDockerRepositoryName }}
+              dockerFilePath: ${{ variables.goToolsetDockerFilePath }}
+              dockerBuildContext: "$(system.defaultWorkingDirectory)"
