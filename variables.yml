@@ -28,3 +28,9 @@ variables:
 
   - name: firebaseToolsetDockerFilePath
     value: "$(system.defaultWorkingDirectory)/firebase-toolset/Dockerfile"
+
+  - name: goToolsetDockerRepositoryName
+    value: "microbusiness/go-toolset"
+
+  - name: goToolsetDockerFilePath
+    value: "$(system.defaultWorkingDirectory)/go-toolset/Dockerfile"
