@@ -1,10 +1,10 @@
-FROM golang:1.16
+FROM golang:1.17
 LABEL maintainer="morteza.alizadeh@gmail.com"
 
 RUN apt-get update -y
 RUN apt-get install unzip
 
-ENV GIT_TAG="3.17.3"
+ENV GIT_TAG="3.18.1"
 ENV PROTOC_ZIP=protoc-$GIT_TAG-linux-x86_64.zip
 RUN curl -OL https://github.com/google/protobuf/releases/download/v$GIT_TAG/$PROTOC_ZIP
 RUN unzip -o $PROTOC_ZIP -d /usr/local bin/protoc
