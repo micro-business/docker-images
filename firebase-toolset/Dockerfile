@@ -1,4 +1,4 @@
-FROM node:14-alpine
+FROM node:18-alpine
 LABEL maintainer="morteza.alizadeh@gmail.com"
 
 RUN npm install -g firebase-tools
