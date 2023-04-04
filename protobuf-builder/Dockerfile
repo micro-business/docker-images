@@ -12,7 +12,6 @@ RUN unzip -o $PROTOC_ZIP -d /usr/local include/*
 RUN rm -f $PROTOC_ZIP
 
 ENV GIT_TAG="v1.5.3"
-RUN go get -d -u github.com/golang/protobuf/protoc-gen-go@$GIT_TAG
 RUN go install github.com/golang/protobuf/protoc-gen-go@$GIT_TAG
 
 RUN apt-get clean
